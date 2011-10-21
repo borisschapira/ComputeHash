@@ -30,7 +30,7 @@ namespace ComputeHash
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Invalide folder URI");
+                    Console.WriteLine("Invalid folder URI");
                     sw.Stop();
                     Console.WriteLine("Time used (rounded): {0} ms", sw.ElapsedMilliseconds);
                     return;
@@ -92,7 +92,7 @@ namespace ComputeHash
             foreach (KeyValuePair<TKey, TValue> pair in dictionary)
                 if (value.Equals(pair.Value)) return pair.Key;
 
-            throw new Exception("the value is not found in the dictionary");
+            throw new Exception("The value is not found in the dictionary");
         }
     }
 }
