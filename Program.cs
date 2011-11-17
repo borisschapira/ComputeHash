@@ -69,6 +69,8 @@ namespace ComputeHash
                             }
                             else
                             {
+                                //Console.WriteLine(currentFile.Name + " : same as " + hashDic.FindKeyByValue(hash));
+                                duplicate++;
                                 if (bilan.ContainsKey(hashDic[hash]))
                                 {
                                     bilan[hashDic[hash]].Add(currentFile.Name);
@@ -86,23 +88,17 @@ namespace ComputeHash
 
             foreach (var itemBilan in bilan)
             {
-                Debug.WriteLine(itemBilan.Key + " : " + itemBilan.Value.Count + " occurence(s)");
+                Console.WriteLine(itemBilan.Key + " : " + itemBilan.Value.Count + " occurence(s)");
                 duplicate += itemBilan.Value.Count;
                 foreach (var itemOccurence in itemBilan.Value)
                 {
-                    Debug.WriteLine("\t=> " + itemOccurence);
+                    Console.WriteLine("\t=> " + itemOccurence);
                 }
             }
 
-            if (duplicate > 0)
-            {
-                Console.WriteLine("===> " + duplicate + " duplicates out of " + rgFiles.Count + " images");
-                Debug.WriteLine("===> " + duplicate + " duplicates out of " + rgFiles.Count + " images");
-            }
-            else
-            {
+            if (duplicate == 0)
+            {   
                 Console.WriteLine("===> No duplicates");
-                Debug.WriteLine("===> No duplicates");
                 Console.WriteLine();
             }
             
