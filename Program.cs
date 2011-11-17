@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Collections.Generic;
@@ -43,14 +43,16 @@ namespace ComputeHash
 
             List<FileInfo> rgFiles;
             Dictionary<String, String> hashDic;
+            Dictionary<String, List<String>> bilan = new Dictionary<string, List<string>>();
 
-            // Going throught files, compute hashes, find duplicates
-            foreach (string ext in extensions)
+
+            rgFiles = new List<FileInfo>();
+            hashDic = new Dictionary<string, string>();
+            rgFiles.Clear();
+
+            foreach (string currentExt in extensions)
             {
-                rgFiles = new List<FileInfo>();
-                hashDic = new Dictionary<string, string>();
-                rgFiles.Clear();
-                rgFiles.AddRange(di.GetFiles(ext));
+                rgFiles.AddRange(di.GetFiles(currentExt, SearchOption.AllDirectories));
 
                 using (HashAlgorithm hashAlg = new SHA1Managed())
                 {
@@ -60,25 +62,52 @@ namespace ComputeHash
                         {
                             string hash = BitConverter.ToString(hashAlg.ComputeHash(file));
 
-                            if (!hashDic.ContainsValue(hash))
+                            if (!hashDic.ContainsKey(hash))
                             {
-                                hashDic.Add(currentFile.Name, hash);
+                                hashDic.Add(hash, currentFile.Name);
                                 //Console.WriteLine(currentFile.Name + " : " + hash);
                             }
                             else
                             {
-                                Console.WriteLine(currentFile.Name + " : same as " + hashDic.FindKeyByValue(hash));
-                                duplicate++;
+                                if (bilan.ContainsKey(hashDic[hash]))
+                                {
+                                    bilan[hashDic[hash]].Add(currentFile.Name);
+                                }
+                                else
+                                {
+                                    bilan.Add(hashDic[hash], new List<string>() {currentFile.Name});
+                                }
                             }
                         }
                     }
                 }
             }
+
+
+            foreach (var itemBilan in bilan)
+            {
+                Debug.WriteLine(itemBilan.Key + " : " + itemBilan.Value.Count + " occurence(s)");
+                duplicate += itemBilan.Value.Count;
+                foreach (var itemOccurence in itemBilan.Value)
+                {
+                    Debug.WriteLine("\t=> " + itemOccurence);
+                }
+            }
+
+            if (duplicate > 0)
+            {
+                Console.WriteLine("===> " + duplicate + " duplicates out of " + rgFiles.Count + " images");
+                Debug.WriteLine("===> " + duplicate + " duplicates out of " + rgFiles.Count + " images");
+            }
+            else
+            {
+                Console.WriteLine("===> No duplicates");
+                Debug.WriteLine("===> No duplicates");
+                Console.WriteLine();
+            }
             
             sw.Stop();
             Console.WriteLine("Time used (rounded): {0} ms", sw.ElapsedMilliseconds);
-            Console.WriteLine("Number of duplicates : {0}", duplicate);
-
             Console.ReadLine();
         }
     }
